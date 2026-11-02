@@ -9,6 +9,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jobhunt.ai.factory import get_embedding_provider, get_llm_provider
+from jobhunt.ai.provider import EmbeddingProvider, LLMProvider
 from jobhunt.core.config import Settings, get_settings
 from jobhunt.core.db import get_session
 from jobhunt.core.security import TokenError, decode_token
@@ -18,6 +20,8 @@ bearer = HTTPBearer(auto_error=False)
 
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
+LLMDep = Annotated[LLMProvider, Depends(get_llm_provider)]
+EmbeddingsDep = Annotated[EmbeddingProvider, Depends(get_embedding_provider)]
 
 
 async def get_current_user(

@@ -2,7 +2,7 @@
 
 An AI assistant for remote job hunting. Give it your resume once; every day it pulls new remote jobs from public job boards, works out which ones you are eligible for and a good fit for, explains why, and tailors your resume and cover letter using only facts from your real experience. It also tracks every application and reminds you to follow up.
 
-> Status: under construction, milestone 1 of 10. Sections below are filled in as milestones land.
+> Status: under construction, milestone 2 of 10. Sections below are filled in as milestones land.
 
 ![Demo placeholder](docs/demo.gif)
 
@@ -60,6 +60,8 @@ Filled in per milestone. So far:
 - **Jobs are shared, judgements are per user.** Ingestion and extraction run once per posting; filters, scores and the LLM judgement are stored per `(user, job)`. This keeps LLM spend linear in users who care about a job, not in users times jobs.
 - **The edited profile is the source of truth; evidence is derived.** The profile document is JSON the user edits. Each bullet, project and skill is re-extracted into an `evidence` row with an embedding and a path back into the document, so retrieval and the grounding check cite exact facts.
 - **One provider interface, native SDKs behind it.** Anthropic and OpenAI are both supported through one small `LLMProvider` protocol using each vendor's structured-output API. Model routing is three settings: a cheap model for extraction, a strong one for judging and writing.
+- **Resume parsing copies, it does not summarise.** The extraction prompt forbids paraphrasing, added metrics or inferred skills, and the profile schema rejects unknown fields and malformed dates. Whatever the model returns is a draft the user reviews and edits; the edited version is what everything downstream uses.
+- **File types come from magic bytes, not names.** Uploads are accepted as PDF or DOCX only after sniffing the header, capped at 5 MB, and a scanned or corrupt PDF returns a clear 422 instead of a crash.
 - **Costs are measured, never guessed.** Every call records tokens and latency; cost is computed from a price table that returns `None` for unknown models rather than a made-up figure.
 
 ## Evaluation
