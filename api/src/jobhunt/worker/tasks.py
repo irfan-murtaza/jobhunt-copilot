@@ -11,9 +11,10 @@ from jobhunt.core.config import get_settings
 from jobhunt.core.db import get_sessionmaker
 from jobhunt.core.logging import get_logger
 from jobhunt.core.redis import get_redis
-from jobhunt.models import Job
+from jobhunt.models import Job, User
 from jobhunt.services.extraction import ExtractionService
 from jobhunt.services.ingestion import IngestionService
+from jobhunt.services.scoring import ScoringService
 from jobhunt.sources.http import SourceHttpClient
 from jobhunt.sources.registry import build_sources
 
@@ -70,3 +71,33 @@ async def extract_job(ctx: dict[str, Any], job_id: str) -> dict[str, Any]:
         "cost_usd": outcome.cost_usd,
         "error": outcome.error,
     }
+
+
+async def score_user(
+    ctx: dict[str, Any], user_id: str, *, judge_pool: int | None = None
+) -> dict[str, Any]:
+    settings = get_settings()
+    async with get_sessionmaker()() as session:
+        user = await session.get(User, user_id)
+        if user is None:
+            return {"user_id": user_id, "status": "missing"}
+        service = ScoringService(
+            session, get_llm_provider(), judge_model=model_for(ModelRole.JUDGE, settings)
+        )
+        report = await service.score_user(user, judge_pool=judge_pool)
+        await session.commit()
+    from dataclasses import asdict
+
+    return {"user_id": user_id, **asdict(report)}
+
+
+async def score_all_users(ctx: dict[str, Any]) -> dict[str, Any]:
+    from sqlalchemy import select
+
+    async with get_sessionmaker()() as session:
+        ids = [
+            str(i) for i in await session.scalars(select(User.id).where(User.is_active.is_(True)))
+        ]
+    for user_id in ids:
+        await ctx["redis"].enqueue_job("score_user", user_id, _job_id=f"score:{user_id}")
+    return {"queued": len(ids)}

@@ -115,6 +115,41 @@ def _extract(args: argparse.Namespace) -> None:
     asyncio.run(_extract_async(args))
 
 
+async def _score_async(args: argparse.Namespace) -> None:
+    from sqlalchemy import select
+
+    from jobhunt.ai.factory import get_llm_provider, model_for
+    from jobhunt.ai.provider import ModelRole
+    from jobhunt.core.config import get_settings
+    from jobhunt.core.db import dispose_engine, get_sessionmaker
+    from jobhunt.core.logging import configure_logging
+    from jobhunt.models import User
+    from jobhunt.services.scoring import ScoringService
+
+    settings = get_settings()
+    configure_logging(settings)
+    async with get_sessionmaker()() as session:
+        user = await session.scalar(select(User).where(User.email == args.email.lower()))
+        if user is None:
+            sys.stderr.write(f"no user with email {args.email}\n")
+            raise SystemExit(1)
+        service = ScoringService(
+            session, get_llm_provider(), judge_model=model_for(ModelRole.JUDGE, settings)
+        )
+        report = await service.score_user(user, judge_pool=args.judge_pool, rescore=args.rescore)
+        await session.commit()
+    await dispose_engine()
+    sys.stdout.write(
+        f"considered={report.considered} filtered_out={report.filtered_out} scored={report.scored} "
+        f"judged={report.judged} judge_cost_usd={report.judge_cost_usd:.4f} "
+        f"errors={len(report.errors)}\n"
+    )
+
+
+def _score(args: argparse.Namespace) -> None:
+    asyncio.run(_score_async(args))
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="jobhunt")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -139,6 +174,14 @@ def main(argv: list[str] | None = None) -> None:
     extract = sub.add_parser("extract", help="run LLM extraction on pending jobs")
     extract.add_argument("--limit", type=int, default=50)
     extract.set_defaults(func=_extract)
+
+    score = sub.add_parser("score", help="filter, score and judge jobs for one user")
+    score.add_argument("--email", required=True)
+    score.add_argument("--judge-pool", type=int, default=None, help="override the judge pool size")
+    score.add_argument(
+        "--rescore", action="store_true", help="re-run filters and hybrid for every job"
+    )
+    score.set_defaults(func=_score)
 
     args = parser.parse_args(argv)
     args.func(args)

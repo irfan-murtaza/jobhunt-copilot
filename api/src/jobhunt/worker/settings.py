@@ -35,7 +35,14 @@ async def ping(ctx: dict[str, Any], message: str = "pong") -> str:
 def _task_functions() -> list[Any]:
     from jobhunt.worker import tasks
 
-    return [ping, tasks.ingest_all, tasks.extract_pending, tasks.extract_job]
+    return [
+        ping,
+        tasks.ingest_all,
+        tasks.extract_pending,
+        tasks.extract_job,
+        tasks.score_user,
+        tasks.score_all_users,
+    ]
 
 
 def redis_settings() -> RedisSettings:

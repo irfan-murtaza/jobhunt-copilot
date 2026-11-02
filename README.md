@@ -2,7 +2,7 @@
 
 An AI assistant for remote job hunting. Give it your resume once; every day it pulls new remote jobs from public job boards, works out which ones you are eligible for and a good fit for, explains why, and tailors your resume and cover letter using only facts from your real experience. It also tracks every application and reminds you to follow up.
 
-> Status: under construction, milestone 3 of 10. Sections below are filled in as milestones land.
+> Status: under construction, milestone 4 of 10. Sections below are filled in as milestones land.
 
 ![Demo placeholder](docs/demo.gif)
 
@@ -66,6 +66,9 @@ Filled in per milestone. So far:
 - **Politeness is enforced in Redis, not by hope.** Every upstream response is cached for the source's TTL, ETag and Last-Modified are replayed as conditional requests, and a per-source cooldown key stops any worker process from hitting the same board twice in a row. The User-Agent names the project and links here.
 - **Dedup is two-stage.** At ingest: same canonical URL, same content hash, or same normalised company and title within a month. After extraction: same company and embedding cosine similarity above 0.95. Every job points at the first copy seen; duplicates stay in the database for provenance but are hidden from the feed by default.
 - **Pasted URLs are fetched with an SSRF guard.** Only public http(s) hosts that resolve to global addresses, capped at 2 MB, HTML only.
+- **Three scoring stages, each cheaper than the next is expensive.** Hard filters are deterministic and give a reason for every exclusion (country, region or timezone eligibility from a geography table, remote type, seniority, salary floor, keywords). The hybrid score blends the mean cosine similarity of the top-3 retrieved evidence items with must-have skill coverage, 50/50. Only the top K jobs by hybrid score (K is a user preference, default 30) go to the LLM judge. Pure embeddings cannot tell "mentions Kafka" from "requires Kafka"; a judge on every job would cost dollars a day.
+- **The judge can only cite evidence we gave it.** Retrieved evidence is labelled E1..En in the prompt. Strengths must reference a label and quote the text; a citation to an unknown label is dropped and counted in `dropped_citations`. The verdict is traceable to real resume facts before any document is written.
+- **Scores are keyed by profile version.** Editing the profile invalidates every judgement; a re-run only redoes work for the current version.
 - **Costs are measured, never guessed.** Every call records tokens and latency; cost is computed from a price table that returns `None` for unknown models rather than a made-up figure.
 
 ## Evaluation
