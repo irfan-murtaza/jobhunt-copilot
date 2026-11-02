@@ -1,0 +1,44 @@
+{
+  "_comment": "Fictional candidate used for seeds, tests and screenshots. Not a real person.",
+  "name": "Casey Rivera",
+  "headline": "Backend engineer, Python and distributed systems",
+  "location": "Lisbon, Portugal",
+  "summary": "Backend engineer with 6 years building data-heavy web services in Python. Led the migration of a monolith to event-driven services at Northwind Analytics and cut p95 API latency by 40%.",
+  "roles": [
+    {
+      "title": "Senior Backend Engineer",
+      "company": "Northwind Analytics",
+      "start": "2021-03",
+      "end": null,
+      "bullets": [
+        "Led migration of a Django monolith to six FastAPI services communicating over Kafka, cutting p95 API latency from 820ms to 490ms.",
+        "Designed a PostgreSQL partitioning scheme for a 2TB events table, reducing nightly aggregation time from 3 hours to 25 minutes.",
+        "Introduced contract tests and a staged rollout pipeline; production incidents fell from 9 to 2 per quarter.",
+        "Mentored three engineers and ran the backend hiring loop."
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Harbor Logistics",
+      "start": "2018-06",
+      "end": "2021-02",
+      "bullets": [
+        "Built a route-optimisation API in Python used by 400 delivery drivers daily.",
+        "Wrote the Celery-based job pipeline that processed 1.2M shipment events per day.",
+        "Added OpenTelemetry tracing across services, cutting mean time to resolution by half."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "pgqueue",
+      "description": "Open-source PostgreSQL-backed job queue for Python with exactly-once delivery semantics; 600 GitHub stars.",
+      "url": "https://github.com/example/pgqueue",
+      "technologies": ["Python", "PostgreSQL", "asyncio"]
+    }
+  ],
+  "skills": ["Python", "FastAPI", "Django", "PostgreSQL", "Kafka", "Redis", "Docker", "Kubernetes", "AWS", "Terraform", "OpenTelemetry"],
+  "education": [
+    {"institution": "University of Porto", "degree": "BSc Computer Science", "start": "2014", "end": "2018"}
+  ]
+}

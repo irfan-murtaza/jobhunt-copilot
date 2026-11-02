@@ -1,0 +1,43 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# Personal data: never commit real resumes or uploads
+uploads/
+data/
+*.pdf
+*.docx
+!api/tests/fixtures/*.pdf
+!api/tests/fixtures/*.docx
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+coverage.xml
+dist/
+build/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+
+# Eval outputs are committed deliberately via `make evals`; scratch runs are not
+api/evals/results/*.tmp.json
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
