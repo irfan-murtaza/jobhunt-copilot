@@ -32,12 +32,18 @@ async def ping(ctx: dict[str, Any], message: str = "pong") -> str:
     return message
 
 
+def _task_functions() -> list[Any]:
+    from jobhunt.worker import tasks
+
+    return [ping, tasks.ingest_all, tasks.extract_pending, tasks.extract_job]
+
+
 def redis_settings() -> RedisSettings:
     return RedisSettings.from_dsn(str(get_settings().redis_url))
 
 
 class WorkerSettings:
-    functions = [ping]
+    functions = _task_functions()
     cron_jobs: list[Any] = []
     on_startup = startup
     on_shutdown = shutdown

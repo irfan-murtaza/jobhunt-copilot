@@ -1,0 +1,5 @@
+{"nbPages": 1, "hits": [
+ {"objectID": "45000101", "parent_id": 45000001, "story_id": 45000001, "created_at_i": 1793580000, "comment_text": "Zeta Analytics | Senior Data Engineer | REMOTE (US or Canada) | Full-time<p>We build analytics for hospitals. Stack: Python, Spark, Snowflake.<p>Email jobs@example.com"},
+ {"objectID": "45000102", "parent_id": 45000001, "story_id": 45000001, "created_at_i": 1793580100, "comment_text": "Theta Games | Gameplay Programmer | Montreal | ONSITE<p>C++ and Unreal."},
+ {"objectID": "45000103", "parent_id": 45000101, "story_id": 45000001, "created_at_i": 1793580200, "comment_text": "Is this remote-friendly for Europe?"}
+]}

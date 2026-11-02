@@ -64,7 +64,7 @@ select = ["E", "F", "I", "B", "UP", "N", "S", "SIM", "RUF", "ASYNC", "T20"]
 ignore = ["S101", "RUF012", "B008", "S106"]  # asserts in tests; mutable class attrs on SQLAlchemy; Depends() defaults; literal token_type args
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S105", "S106"]  # test passwords
+"tests/**" = ["S105", "S106", "ASYNC240", "E501"]  # test passwords; sync file ops and long literals in tests
 "alembic/**" = ["E501"]
 
 [tool.mypy]

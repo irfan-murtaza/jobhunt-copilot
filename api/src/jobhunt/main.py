@@ -20,6 +20,7 @@ from jobhunt.core.db import dispose_engine
 from jobhunt.core.logging import configure_logging, get_logger
 from jobhunt.core.ratelimit import limiter
 from jobhunt.core.redis import close_redis
+from jobhunt.worker.queue import close_pool
 
 log = get_logger(__name__)
 
@@ -31,6 +32,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
     await dispose_engine()
     await close_redis()
+    await close_pool()
     log.info("app.stop")
 
 

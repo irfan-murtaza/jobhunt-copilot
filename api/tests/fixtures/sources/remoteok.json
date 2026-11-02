@@ -1,0 +1,4 @@
+[{"legal": "RemoteOK API terms: link back to the job page..."},
+ {"id": "7001", "slug": "7001-senior-backend-engineer-acme-robotics", "url": "https://remoteok.com/remote-jobs/7001-senior-backend-engineer-acme-robotics", "position": "Senior Backend Engineer", "company": "Acme Robotics", "location": "Worldwide", "tags": ["python", "backend"], "description": "We are hiring a <b>Senior Backend Engineer</b>.<br>5+ years Python<br>PostgreSQL<br>Remote, anywhere.", "date": "2026-10-30T09:15:00+00:00", "epoch": 1793438100, "salary_min": 120000, "salary_max": 150000},
+ {"id": "7002", "slug": "7002-devops", "url": "https://remoteok.com/remote-jobs/7002-devops", "position": "DevOps Engineer", "company": "Gamma Cloud", "location": "Europe", "tags": ["devops", "kubernetes"], "description": "Kubernetes and Terraform. Europe timezones.", "date": "2026-10-28T08:00:00+00:00", "epoch": 1793260800, "salary_min": 0, "salary_max": 0}
+]
