@@ -2,7 +2,7 @@
 
 An AI assistant for remote job hunting. Give it your resume once; every day it pulls new remote jobs from public job boards, works out which ones you are eligible for and a good fit for, explains why, and tailors your resume and cover letter using only facts from your real experience. It also tracks every application and reminds you to follow up.
 
-> Status: under construction, milestone 4 of 10. Sections below are filled in as milestones land.
+> Status: under construction, milestone 5 of 10. Sections below are filled in as milestones land.
 
 ![Demo placeholder](docs/demo.gif)
 
@@ -49,7 +49,7 @@ Local development without Docker: `make setup`, then `make api`, `make worker` a
 
 ```
 api/   FastAPI service, arq worker, LangGraph workflows, MCP server, evals (Python 3.12, uv)
-web/   Next.js App Router front end (TypeScript, Tailwind)
+web/   Next.js App Router front end (TypeScript, Tailwind v4, dnd-kit)
 docs/  Architecture notes and deployment guide
 ```
 
@@ -69,6 +69,9 @@ Filled in per milestone. So far:
 - **Three scoring stages, each cheaper than the next is expensive.** Hard filters are deterministic and give a reason for every exclusion (country, region or timezone eligibility from a geography table, remote type, seniority, salary floor, keywords). The hybrid score blends the mean cosine similarity of the top-3 retrieved evidence items with must-have skill coverage, 50/50. Only the top K jobs by hybrid score (K is a user preference, default 30) go to the LLM judge. Pure embeddings cannot tell "mentions Kafka" from "requires Kafka"; a judge on every job would cost dollars a day.
 - **The judge can only cite evidence we gave it.** Retrieved evidence is labelled E1..En in the prompt. Strengths must reference a label and quote the text; a citation to an unknown label is dropped and counted in `dropped_citations`. The verdict is traceable to real resume facts before any document is written.
 - **Scores are keyed by profile version.** Editing the profile invalidates every judgement; a re-run only redoes work for the current version.
+- **The UI shows the reasoning, not just the rank.** Each match opens a three-step panel: which hard filters it passed or failed and why, which of your bullets were retrieved with their similarity, which must-have skills matched or are missing, and the judge's verdict with quoted evidence, gaps and risks. Scores you cannot interrogate are not worth trusting.
+- **The tracker is an event log wearing a Kanban.** Stage changes, notes and reminders are append-only events, so every card has a full history. Moving to Applied stamps the date and schedules a follow-up seven days out; Offer and Rejected clear it.
+- **Keyless development works.** `EMBEDDING_PROVIDER=hash` swaps in a deterministic offline embedder so the whole app runs without API keys, and provider misconfiguration surfaces as a 503 with a plain message instead of a 500.
 - **Costs are measured, never guessed.** Every call records tokens and latency; cost is computed from a price table that returns `None` for unknown models rather than a made-up figure.
 
 ## Evaluation

@@ -52,6 +52,7 @@ class Application(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         back_populates="application",
         cascade="all, delete-orphan",
         order_by="ApplicationEvent.created_at",
+        lazy="selectin",  # always shown with the application; also lets AsyncSession.refresh work
     )
 
 

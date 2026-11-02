@@ -8,6 +8,9 @@ from jobhunt.ai.embeddings import HashEmbeddingProvider, OpenAIEmbeddingProvider
 from jobhunt.ai.provider import EmbeddingProvider, LLMProvider, ModelRole
 from jobhunt.ai.tracing import Tracer, build_tracer
 from jobhunt.core.config import Settings, get_settings
+from jobhunt.core.logging import get_logger
+
+log = get_logger(__name__)
 
 
 class ProviderConfigurationError(RuntimeError):
@@ -47,7 +50,12 @@ def build_llm_provider(settings: Settings, tracer: Tracer) -> LLMProvider:
 
 
 def build_embedding_provider(settings: Settings, tracer: Tracer) -> EmbeddingProvider:
-    if settings.is_test:
+    if settings.is_test or settings.embedding_provider == "hash":
+        if not settings.is_test:
+            log.warning(
+                "embeddings.hash_provider",
+                msg="EMBEDDING_PROVIDER=hash: offline, demo-quality embeddings",
+            )
         return HashEmbeddingProvider(dimensions=settings.embedding_dimensions)
     if not settings.openai_api_key:
         raise ProviderConfigurationError("OPENAI_API_KEY is required for embeddings")

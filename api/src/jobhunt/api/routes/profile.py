@@ -88,10 +88,8 @@ async def upload_resume(
 
 
 @router.get("", response_model=ProfileRead)
-async def get_profile(
-    user: CurrentUser, session: SessionDep, embeddings: EmbeddingsDep
-) -> ProfileRead:
-    service = ProfileService(session, embeddings)
+async def get_profile(user: CurrentUser, session: SessionDep) -> ProfileRead:
+    service = ProfileService(session)
     profile = await service.get(user)
     if profile is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No profile yet. Upload a resume first.")
@@ -109,11 +107,9 @@ async def update_profile(
 
 
 @router.get("/evidence", response_model=list[EvidenceRead])
-async def list_evidence(
-    user: CurrentUser, session: SessionDep, embeddings: EmbeddingsDep
-) -> list[EvidenceRead]:
+async def list_evidence(user: CurrentUser, session: SessionDep) -> list[EvidenceRead]:
     """The citable facts derived from the profile. Useful to see what retrieval can find."""
-    service = ProfileService(session, embeddings)
+    service = ProfileService(session)
     profile = await service.get(user)
     if profile is None:
         return []

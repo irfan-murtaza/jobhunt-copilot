@@ -109,7 +109,8 @@ def build_evidence(document: ProfileDocument) -> list[EvidenceItem]:
 
 
 class ProfileService:
-    def __init__(self, session: AsyncSession, embeddings: EmbeddingProvider) -> None:
+    def __init__(self, session: AsyncSession, embeddings: EmbeddingProvider | None = None) -> None:
+        """`embeddings` is only needed for `save`; read paths work without a provider."""
         self._session = session
         self._embeddings = embeddings
 
@@ -155,6 +156,8 @@ class ProfileService:
         return profile
 
     async def _rebuild_evidence(self, profile: Profile, document: ProfileDocument) -> None:
+        if self._embeddings is None:
+            raise RuntimeError("ProfileService.save requires an embedding provider")
         items = build_evidence(document)
         vectors = await self._embeddings.embed([item.embedding_text for item in items])
         await self._session.execute(delete(Evidence).where(Evidence.profile_id == profile.id))

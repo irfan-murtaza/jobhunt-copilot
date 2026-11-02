@@ -9,11 +9,13 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
 from jobhunt import __version__
+from jobhunt.ai.factory import ProviderConfigurationError
 from jobhunt.api.router import api_router
 from jobhunt.core.config import Settings, get_settings
 from jobhunt.core.db import dispose_engine
@@ -58,6 +60,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["*"],
     )
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
+
+    @app.exception_handler(ProviderConfigurationError)
+    async def provider_not_configured(_: Request, exc: ProviderConfigurationError) -> JSONResponse:
+        return JSONResponse(
+            status_code=503, content={"detail": f"AI provider not configured: {exc}"}
+        )
+
     app.add_middleware(SlowAPIMiddleware)
 
     @app.middleware("http")

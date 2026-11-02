@@ -17,6 +17,7 @@ CSVList = Annotated[list[str], NoDecode]
 
 Environment = Literal["development", "test", "production"]
 LLMProviderName = Literal["anthropic", "openai"]
+EmbeddingProviderName = Literal["openai", "hash"]
 
 
 class Settings(BaseSettings):
@@ -49,6 +50,8 @@ class Settings(BaseSettings):
     model_extract: str = "claude-haiku-5-5"
     model_judge: str = "claude-opus-5-5"
     model_write: str = "claude-opus-5-5"
+    # "hash" is an offline, deterministic embedder for development and tests without API keys.
+    embedding_provider: EmbeddingProviderName = "openai"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
 

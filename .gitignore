@@ -41,3 +41,6 @@ api/evals/results/*.tmp.json
 .idea/
 .vscode/
 *.swp
+
+# Local editor/agent config
+.claude/
