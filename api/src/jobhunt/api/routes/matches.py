@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query, Request, status
+from fastapi import APIRouter, HTTPException, Query, Request, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -116,7 +116,7 @@ async def list_matches(
 
 @router.post("/score", response_model=Message, status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("5/minute")
-async def queue_scoring(request: Request, user: CurrentUser) -> Message:
+async def queue_scoring(request: Request, response: Response, user: CurrentUser) -> Message:
     """Score every extracted job against the current profile in the background."""
     job_id = await enqueue("score_user", str(user.id))
     return Message(detail=f"Scoring queued ({job_id})")
@@ -126,6 +126,7 @@ async def queue_scoring(request: Request, user: CurrentUser) -> Message:
 @limiter.limit("2/minute")
 async def score_now(
     request: Request,
+    response: Response,
     user: CurrentUser,
     session: SessionDep,
     settings: SettingsDep,
@@ -169,6 +170,7 @@ async def get_match(job_id: uuid.UUID, user: CurrentUser, session: SessionDep) -
 @limiter.limit("10/minute")
 async def judge_one(
     request: Request,
+    response: Response,
     job_id: uuid.UUID,
     user: CurrentUser,
     session: SessionDep,

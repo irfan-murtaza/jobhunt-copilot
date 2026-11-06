@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 import httpx
-from fastapi import APIRouter, HTTPException, Query, Request, status
+from fastapi import APIRouter, HTTPException, Query, Request, Response, status
 from sqlalchemy import func, or_, select
 
 from jobhunt.ai.factory import model_for
@@ -124,7 +124,7 @@ async def list_sources(
 
 @router.post("/ingest", response_model=Message, status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("3/minute")
-async def trigger_ingestion(request: Request, _: CurrentUser) -> Message:
+async def trigger_ingestion(request: Request, response: Response, _: CurrentUser) -> Message:
     """Queue a fetch from every source followed by extraction of pending jobs."""
     job = await enqueue("ingest_all")
     return Message(detail=f"Ingestion queued ({job})")
@@ -134,6 +134,7 @@ async def trigger_ingestion(request: Request, _: CurrentUser) -> Message:
 @limiter.limit("10/minute")
 async def add_manual_job(
     request: Request,
+    response: Response,
     body: ManualJobCreate,
     user: CurrentUser,
     session: SessionDep,
